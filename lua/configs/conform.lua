@@ -1,8 +1,24 @@
 local options = {
     formatters_by_ft = {
         lua = { "stylua" },
+        python = { "isort", "black" },
     },
-
+    formatters = {
+        -- Python
+        black = {
+            prepend_args = {
+                "--fast",
+                "--line-length",
+                "100",
+            },
+        },
+        isort = {
+            prepend_args = {
+                "--profile",
+                "black",
+            },
+        },
+    },
     format_on_save = {
         -- These options will be passed to conform.format()
         timeout_ms = 500,

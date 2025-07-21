@@ -1,5 +1,13 @@
 return {
     {
+        "rshkarin/mason-nvim-lint",
+        event = "VeryLazy",
+        dependencies = { "nvim-lint" },
+        config = function()
+            require("configs.mason-lint")
+        end,
+    },
+    {
         "stevearc/conform.nvim",
         event = "BufWritePre",
         config = function()
@@ -51,7 +59,15 @@ return {
             -- your config goes here
             -- or just leave it empty :)
         },
-    }, --
+    },
+
+    {
+        "mfussenegger/nvim-lint",
+        event = { "BufReadPre", "BufNewFile" },
+        config = function()
+            require("configs.lint")
+        end,
+    },
     -- test new blink
     -- { import = "nvchad.blink.lazyspec" },
 

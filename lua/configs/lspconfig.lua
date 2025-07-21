@@ -47,3 +47,18 @@ lspconfig.lua_ls.setup({
         },
     },
 })
+
+lspconfig.pyright.setup({
+    on_attach = on_attach,
+    on_init = on_init,
+    capabilities = capabilities,
+
+    settings = {
+        python = {
+            analysis = {
+                typeCheckingMode = "off",
+                -- Disable type checking diagnostics
+            },
+        },
+    },
+})

@@ -1,9 +1,13 @@
-**This repo is supposed to be used as config by NvChad users!**
+⚠️ Personal Config Notice
+This is my personal modified version of the Lua configuration for NvChad.
+It builds on the official NvChad setup, but includes custom changes tailored to my preferences.
 
-- The main nvchad repo (NvChad/NvChad) is used as a plugin by this repo.
-- So you just import its modules , like `require "nvchad.options" , require "nvchad.mappings"`
-- So you can delete the .git from this repo ( when you clone it locally ) or fork it :)
+About
 
-# Credits
+This repo is based on the default NvChad user config setup.
 
-1) Lazyvim starter https://github.com/LazyVim/starter as nvchad's starter was inspired by Lazyvim's . It made a lot of things easier!
+The main NvChad repo (NvChad/NvChad) is used as a plugin by this repo.
+
+You import its modules like require "nvchad.options" or require "nvchad.mappings".
+
+If you clone this locally, you can delete the .git folder or fork it to start your own custom version.
