@@ -108,6 +108,14 @@ return {
         config = function()
             require("configs.mason-dap")
         end,
+        -- For `plugins/markview.lua` users.
+    },
+
+    {
+        "OXY2DEV/markview.nvim",
+        lazy = false,
+        -- For `nvim-treesitter` users.
+        priority = 49,
     },
     -- test new blink
     -- { import = "nvchad.blink.lazyspec" },
