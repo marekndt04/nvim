@@ -3,22 +3,23 @@ local options = {
         lua = { "stylua" },
         python = { "isort", "black" },
     },
-    formatters = {
-        -- Python
-        black = {
-            prepend_args = {
-                "--fast",
-                "--line-length",
-                "100",
-            },
-        },
-        isort = {
-            prepend_args = {
-                "--profile",
-                "black",
-            },
-        },
-    },
+    -- Precedence for settings in pyproject.toml
+    -- formatters = {
+    --     -- Python
+    --     black = {
+    --         prepend_args = {
+    --             "--fast",
+    --             "--line-length",
+    --             "50",
+    --         },
+    --     },
+    --     isort = {
+    --         prepend_args = {
+    --             "--profile",
+    --             "black",
+    --         },
+    --     },
+    -- },
     format_on_save = {
         -- These options will be passed to conform.format()
         timeout_ms = 500,
