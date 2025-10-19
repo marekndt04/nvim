@@ -2,7 +2,8 @@ local on_attach = require("nvchad.configs.lspconfig").on_attach
 local on_init = require("nvchad.configs.lspconfig").on_init
 local capabilities = require("nvchad.configs.lspconfig").capabilities
 
-local lspconfig = require("lspconfig")
+-- local lspconfig = require("lspconfig") -- pre nvim 0.11
+local lspconfig = require("nvchad.configs.lspconfig") -- nvim 0.11
 
 -- list of all servers configured.
 lspconfig.servers = {
@@ -15,14 +16,16 @@ local default_servers = {}
 
 -- lsps with default config
 for _, lsp in ipairs(default_servers) do
-    lspconfig[lsp].setup({
+    -- lspconfig[lsp].setup({ -- pre nvim 0.11
+    vim.lsp.config(lsp, { -- nvim 0.11
         on_attach = on_attach,
         on_init = on_init,
         capabilities = capabilities,
     })
 end
 
-lspconfig.lua_ls.setup({
+-- lspconfig.lua_ls.setup({ -- pre nvim 0.11
+vim.lsp.config("lua_ls", { -- nvim 0.11
     on_attach = on_attach,
     on_init = on_init,
     capabilities = capabilities,
@@ -47,19 +50,3 @@ lspconfig.lua_ls.setup({
         },
     },
 })
-
--- this was causing double hints for imports and other prompts :O
--- lspconfig.pyright.setup({
---     on_attach = on_attach,
---     on_init = on_init,
---     capabilities = capabilities,
---
---     settings = {
---         python = {
---             analysis = {
---                 typeCheckingMode = "off",
---                 -- Disable type checking diagnostics
---             },
---         },
---     },
--- })
