@@ -25,28 +25,28 @@ for _, lsp in ipairs(default_servers) do
 end
 
 -- lspconfig.lua_ls.setup({ -- pre nvim 0.11
-vim.lsp.config("lua_ls", { -- nvim 0.11
-    on_attach = on_attach,
-    on_init = on_init,
-    capabilities = capabilities,
-
-    settings = {
-        Lua = {
-            diagnostics = {
-                enable = false, -- Disable all diagnostics from lua_ls
-                -- globals = { "vim" },
-            },
-            workspace = {
-                library = {
-                    vim.fn.expand("$VIMRUNTIME/lua"),
-                    vim.fn.expand("$VIMRUNTIME/lua/vim/lsp"),
-                    vim.fn.stdpath("data") .. "/lazy/ui/nvchad_types",
-                    vim.fn.stdpath("data") .. "/lazy/lazy.nvim/lua/lazy",
-                    "${3rd}/love2d/library",
-                },
-                maxPreload = 100000,
-                preloadFileSize = 10000,
-            },
-        },
-    },
-})
+-- vim.lsp.config("lua_ls", { -- nvim 0.11
+--     on_attach = on_attach,
+--     on_init = on_init,
+--     capabilities = capabilities,
+--
+--     settings = {
+--         Lua = {
+--             diagnostics = {
+--                 enable = false, -- Disable all diagnostics from lua_ls
+--                 -- globals = { "vim" },
+--             },
+--             workspace = {
+--                 library = {
+--                     vim.fn.expand("$VIMRUNTIME/lua"),
+--                     vim.fn.expand("$VIMRUNTIME/lua/vim/lsp"),
+--                     vim.fn.stdpath("data") .. "/lazy/ui/nvchad_types",
+--                     vim.fn.stdpath("data") .. "/lazy/lazy.nvim/lua/lazy",
+--                     "${3rd}/love2d/library",
+--                 },
+--                 maxPreload = 100000,
+--                 preloadFileSize = 10000,
+--             },
+--         },
+--     },
+-- })
