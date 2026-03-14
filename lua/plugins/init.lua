@@ -127,4 +127,12 @@ return {
             require("configs.rustacean")
         end,
     },
+
+    {
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("configs.nvim-tree")
+        end,
+    },
 }
