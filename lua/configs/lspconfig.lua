@@ -9,6 +9,7 @@ local lspconfig = require("nvchad.configs.lspconfig") -- nvim 0.11
 lspconfig.servers = {
     "lua_ls",
     "pyright",
+    "rust_analyzer",
 }
 
 -- list of servers configured with default config.

@@ -15,7 +15,6 @@ return {
         end,
     },
 
-    -- These are some examples, uncomment them if you want to see them work!
     {
         "neovim/nvim-lspconfig",
         event = { "BufReadPre", "BufNewFile" },
@@ -102,6 +101,7 @@ return {
             require("configs.dap-python")
         end,
     },
+
     {
         "jay-babu/mason-nvim-dap.nvim",
         event = "VeryLazy",
@@ -117,16 +117,14 @@ return {
         -- For `nvim-treesitter` users.
         priority = 49,
     },
-    -- test new blink
-    -- { import = "nvchad.blink.lazyspec" },
 
-    -- {
-    -- 	"nvim-treesitter/nvim-treesitter",
-    -- 	opts = {
-    -- 		ensure_installed = {
-    -- 			"vim", "lua", "vimdoc",
-    --      "html", "css"
-    -- 		},
-    -- 	},
-    -- },
+    {
+        "mrcjkb/rustaceanvim",
+        version = "^6", -- Recommended
+        lazy = false, -- This plugin is already lazy
+        ft = "rust",
+        config = function()
+            require("configs.rustacean")
+        end,
+    },
 }
