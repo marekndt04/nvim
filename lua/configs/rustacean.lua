@@ -19,5 +19,14 @@ vim.g.rustaceanvim = function()
         dap = {
             adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
         },
+        server = {
+            settings = {
+                ["rust-analyzer"] = {
+                    checkOnSave = {
+                        enable = false, -- disables cargo check, leaving only rust-analyzer diagnostics
+                    },
+                },
+            },
+        },
     }
 end
