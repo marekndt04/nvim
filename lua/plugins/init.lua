@@ -118,6 +118,9 @@ return {
         lazy = false,
         -- For `nvim-treesitter` users.
         priority = 49,
+        config = function()
+            require("configs.markview")
+        end,
     },
 
     {
