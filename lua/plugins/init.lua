@@ -26,6 +26,8 @@ return {
 
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main", -- master is frozen and broken on Neovim 0.12+
+        build = ":TSUpdate", -- overrides NvChad's ":TSUpdate | TSInstallAll" (TSInstallAll is master-only)
         event = { "BufReadPre", "BufNewFile" },
         config = function()
             require("configs.treesitter")
@@ -119,20 +121,18 @@ return {
     },
 
     {
-        "mrcjkb/rustaceanvim",
-        version = "^6", -- Recommended
-        lazy = false, -- This plugin is already lazy
-        ft = "rust",
-        config = function()
-            require("configs.rustacean")
-        end,
-    },
-
-    {
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("configs.nvim-tree")
+        end,
+    },
+
+    {
+        "akinsho/toggleterm.nvim",
+        event = "VeryLazy",
+        config = function()
+            require("configs.toggleterm")
         end,
     },
 }

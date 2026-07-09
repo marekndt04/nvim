@@ -7,7 +7,6 @@ local lspconfig = require("nvchad.configs.lspconfig")
 lspconfig.servers = {
     "lua_ls",
     "pyright",
-    "rust_analyzer",
 }
 
 local default_servers = {}

@@ -32,7 +32,7 @@ lua/
     ├── mason-dap.lua
     ├── treesitter.lua
     ├── nvim-tree.lua
-    └── rustacean.lua
+    └── toggleterm.lua   # floating terminal + lazygit integration
 ```
 
 **Rule:** every non-trivial plugin gets its own file in `lua/configs/<plugin-name>.lua`. The `lua/plugins/init.lua` only contains the lazy spec and a `config` function that `require`s that file.
@@ -79,9 +79,9 @@ Only when the plugin literally needs no setup, inline `opts = {}` is acceptable:
 - `event = { "BufReadPre", "BufNewFile" }` — LSP, linters, treesitter
 - `event = "BufWritePre"` — formatters (conform)
 - `event = "VeryLazy"` — mason-* bridges, auxiliary tools
-- `ft = "python"` / `ft = "rust"` — language-specific tools
+- `ft = "python"` — language-specific tools
 - `cmd = "SomeCmd"` — command-triggered plugins
-- `lazy = false` — only when strictly required (e.g. `rustaceanvim`, `markview.nvim`)
+- `lazy = false` — only when strictly required (e.g. `markview.nvim`)
 
 ### 2.4 Dependencies
 
@@ -146,9 +146,9 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 - Includes a `VimEnter` autocmd that auto-opens the tree when nvim starts with no args.
 - Includes the `<leader>e` toggle keymap.
 
-### 3.7 Language-specific “mega” plugins (e.g. `rustaceanvim`)
+### 3.7 Language-specific “mega” plugins
 
-These bypass `nvim-lspconfig` and `nvim-dap` setups. Configure them in their own file (e.g. `configs/rustacean.lua`) using their native API (`vim.g.rustaceanvim = function() ... end`).
+Some plugins (e.g. `rustaceanvim` for Rust) bypass `nvim-lspconfig` and `nvim-dap` setups. If one is added, configure it in its own file in `lua/configs/` using its native API.
 
 ---
 

@@ -14,3 +14,4 @@ map("n", "<A-j>", ":bprevious<CR>", opts)
 -- toggle preview
 map("n", "<leader>mt", ":Markview splitOpen<CR>", opts)
 map("n", "<leader>mx", ":Markview splitClose<CR>", opts)
+map("n", "<leader>mm", ":Markview toggle<CR>", opts)
