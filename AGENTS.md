@@ -32,7 +32,8 @@ lua/
     ├── mason-dap.lua
     ├── treesitter.lua
     ├── nvim-tree.lua
-    └── toggleterm.lua   # floating terminal + lazygit integration
+    ├── toggleterm.lua   # floating terminal + lazygit integration
+    └── neovim-project.lua # project/session manager (projects under ~/workspace)
 ```
 
 **Rule:** every non-trivial plugin gets its own file in `lua/configs/<plugin-name>.lua`. The `lua/plugins/init.lua` only contains the lazy spec and a `config` function that `require`s that file.

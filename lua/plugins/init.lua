@@ -135,4 +135,22 @@ return {
             require("configs.toggleterm")
         end,
     },
+
+    {
+        "coffebar/neovim-project",
+        lazy = false, -- required: discovers projects and restores sessions at startup
+        priority = 100,
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim",
+            "Shatur/neovim-session-manager",
+        },
+        init = function()
+            -- save global variables in sessions (plugin state)
+            vim.opt.sessionoptions:append("globals")
+        end,
+        config = function()
+            require("configs.neovim-project")
+        end,
+    },
 }
