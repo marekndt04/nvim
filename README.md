@@ -63,3 +63,35 @@ Consequences:
 
 For personal scratch files (notes, throwaway scripts) that should never show up at all, use the repo-local, never-committed ignore file `.git/info/exclude`.
 
+## Project management
+
+Projects are managed by [neovim-project](https://github.com/coffebar/neovim-project) (spec in `lua/plugins/init.lua`, config in `lua/configs/neovim-project.lua`), backed by [neovim-session-manager](https://github.com/Shatur/neovim-session-manager) for per-project sessions (open tabs/buffers restored on return — PyCharm-style "reopen where I left off").
+
+Project discovery patterns: `~/workspace/*` plus `~/.config/nvim`.
+
+### Keymaps and commands
+
+| Key / Command | Action |
+|---|---|
+| `<leader>fp` | Project picker, most recent first |
+| `<leader>fP` | Reopen previous project session |
+| `:NeovimProjectDiscover` | Find project by config patterns |
+| `:NeovimProjectHistory` | Pick from recently opened projects |
+| `Ctrl+d` in picker | Forget project + delete its session |
+
+### Behavior notes
+
+- Sessions save automatically on quit and on project switch.
+- Starting nvim inside a project directory loads that project's session; starting elsewhere loads the most recent session (`last_session_on_startup`). The `nvim` shell function's `cd $PWD` is therefore still meaningful — it selects which project session auto-loads.
+- Opening the same project in two nvim instances causes session-file overwrites — avoid; parallel *different* projects are fine.
+- Opening a project in a new window is not supported by the plugin — use a new iTerm window + `nvim` in the project dir instead.
+- `NvimTree` and `toggleterm` buffers are excluded from session saves (`session_manager_opts.autosave_ignore_filetypes`) to avoid broken layouts on restore.
+
+### File explorer follows project switches
+
+nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
+
+### Terminal title follows the project
+
+`lua/options.lua` sets `title` + `titlestring` (`nvim — <cwd basename>`), so the iTerm title bar shows the active project name and updates on project switch. If the title bar shows the launch command instead, set the iTerm profile's Title to "Session Name" (Settings → Profiles → General).
+
