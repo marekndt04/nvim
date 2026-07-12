@@ -1,0 +1,24 @@
+# lazygit binary + archive (downloaded release artifacts)
+/lazygit
+/lazygit.tar.gz
+
+# spell directory (environment-specific)
+/spell/
+
+# netrw history
+.netrwhist
+
+# vim/nvim runtime caches
+.cache/
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# editor backup/swap/undo (if ever written in-tree)
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
