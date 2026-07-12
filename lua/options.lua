@@ -11,3 +11,7 @@ o.softtabstop = 4
 
 vim.opt.spell = true
 vim.opt.spelllang = { "en_gb" }
+
+-- Terminal window title follows the current project (cwd basename)
+o.title = true
+o.titlestring = "nvim — %{fnamemodify(getcwd(), ':t')}"

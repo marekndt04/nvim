@@ -32,7 +32,9 @@ lua/
     ├── mason-dap.lua
     ├── treesitter.lua
     ├── nvim-tree.lua
-    └── rustacean.lua
+    ├── rustacean.lua      # rustaceanvim mega-plugin (Rust LSP + DAP)
+    ├── toggleterm.lua     # floating terminal + lazygit integration
+    └── neovim-project.lua # project/session manager (projects under ~/workspace)
 ```
 
 **Rule:** every non-trivial plugin gets its own file in `lua/configs/<plugin-name>.lua`. The `lua/plugins/init.lua` only contains the lazy spec and a `config` function that `require`s that file.
@@ -145,10 +147,19 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 - Call `require("nvim-tree").setup({ ... })`.
 - Includes a `VimEnter` autocmd that auto-opens the tree when nvim starts with no args.
 - Includes the `<leader>e` toggle keymap.
+- `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` are **required** — they make the tree follow cwd changes when neovim-project switches projects. Do not remove them.
 
 ### 3.7 Language-specific “mega” plugins (e.g. `rustaceanvim`)
 
 These bypass `nvim-lspconfig` and `nvim-dap` setups. Configure them in their own file (e.g. `configs/rustacean.lua`) using their native API (`vim.g.rustaceanvim = function() ... end`).
+
+### 3.8 neovim-project (`configs/neovim-project.lua`)
+
+- Project/session manager (`coffebar/neovim-project` + `Shatur/neovim-session-manager`), picker via telescope.
+- Project roots: `~/workspace/*` and `~/.config/nvim` — extend the `projects` list for new locations.
+- Spec in `plugins/init.lua` must keep `lazy = false` + `priority = 100` (startup discovery/session restore) and the `init` block appending `globals` to `sessionoptions`.
+- `session_manager_opts.autosave_ignore_filetypes` **replaces** the plugin defaults — when adding a filetype, keep the existing list (includes `toggleterm` and `NvimTree` to avoid broken session layouts).
+- Keymaps `<leader>fp` (picker) and `<leader>fP` (previous session) live here.
 
 ---
 
@@ -189,6 +200,7 @@ map("n", "<leader>xx", "<cmd>SomeCmd<CR>", { desc = "Short description" })
 
 - `lua/options.lua` — first line must be `require("nvchad.options")`. Append `vim.o` / `vim.opt` settings below.
 - `lua/autocmds.lua` — first line must be `require("nvchad.autocmds")`. Add autocmds and a few global keymaps (buffer navigation, markview toggle) here.
+- `options.lua` sets `title` + `titlestring` (terminal title = `nvim — <cwd basename>`) so the iTerm title bar follows neovim-project switches — keep it.
 
 Do not move plugin-related autocmds (lint trigger, nvim-tree auto-open) out of their respective `configs/` files.
 

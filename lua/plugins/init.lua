@@ -26,6 +26,8 @@ return {
 
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        build = ":TSUpdate",
         event = { "BufReadPre", "BufNewFile" },
         config = function()
             require("configs.treesitter")
@@ -133,6 +135,31 @@ return {
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("configs.nvim-tree")
+        end,
+    },
+
+    {
+        "akinsho/toggleterm.nvim",
+        event = "VeryLazy",
+        config = function()
+            require("configs.toggleterm")
+        end,
+    },
+
+    {
+        "coffebar/neovim-project",
+        lazy = false,
+        priority = 100,
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim",
+            "Shatur/neovim-session-manager",
+        },
+        init = function()
+            vim.opt.sessionoptions:append("globals")
+        end,
+        config = function()
+            require("configs.neovim-project")
         end,
     },
 }
