@@ -26,7 +26,7 @@ return {
 
     {
         "nvim-treesitter/nvim-treesitter",
-        branch = "main",
+        branch = "master",
         build = ":TSUpdate",
         event = { "BufReadPre", "BufNewFile" },
         config = function()
