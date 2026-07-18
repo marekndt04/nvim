@@ -141,6 +141,8 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 
 - Add parsers to `options.ensure_installed`.
 - Keep `highlight` and `indent` blocks as-is unless explicitly changing behavior.
+- The plugin spec pins `branch = "master"` (with `build = ":TSUpdate"`). **Do not switch to `main` on Neovim 0.11.x.** The `main` branch is a rewrite that requires **Neovim 0.12+** (it uses `vim.list.unique`, absent on 0.11.x) and the **external `tree-sitter` CLI (≥0.26.1)** to build parsers and link queries (`install.lua:309`). On 0.11.x, `main` silently leaves `stdpath('data')/site/{parser,queries}` empty, so any language not bundled by the Neovim AppImage (e.g. python) loses all highlighting. `master` compiles with `cc`/`gcc` and auto-manages queries — this is why we're on it.
+- **Upgrade trigger:** once on Neovim 0.12/nightly (and with the `tree-sitter` CLI installed, e.g. a prebuilt binary in `~/.local/bin`), `main` becomes available again. To switch: in `lua/plugins/init.lua` change `branch = "master"` → `branch = "main"`, and rewrite `configs/treesitter.lua` to the main-API form (`require("nvim-treesitter").install({...})` + a `FileType` autocmd that calls `vim.treesitter.start(args.buf)` and sets `vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"`). Both versions are recoverable from git history (commit `2f57aac` = master form).
 
 ### 3.6 nvim-tree (`configs/nvim-tree.lua`)
 

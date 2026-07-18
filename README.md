@@ -4,6 +4,10 @@ It builds on the official NvChad setup and includes custom changes tailored to m
 
 ## Personal notes
 - Be careful when installing `neovim`, as different package managers may provide different current stable versions. In my case, Ubuntu `apt` installed 0.6.x, while the recommended stable version available via `appimage` was 0.11.x.
+
+> **Planned upgrade — Neovim 0.12 / nightly.** The `nvim-treesitter` plugin is pinned to `branch = "master"` (see `lua/plugins/init.lua`) because the `main` branch is a rewrite that requires **Neovim 0.12+** (uses `vim.list.unique`, absent on 0.11.x) and the **external `tree-sitter` CLI (≥0.26.1)** to build parsers and install queries. On 0.11.x, `main` silently leaves `~/.local/share/nvim/site/{parser,queries}` empty — so any language not bundled by the AppImage (e.g. **python**) loses highlight colors while `lua` (AppImage-bundled) and `rust` (LSP via `rustaceanvim`) keep working.
+>
+> **When to upgrade:** at some point, install the Neovim 0.12/nightly AppImage and the `tree-sitter` CLI (prebuilt binary to `~/.local/bin` from https://github.com/tree-sitter/tree-sitter/releases), then flip `branch = "master"` → `branch = "main"` in `lua/plugins/init.lua` and rewrite `lua/configs/treesitter.lua` to the main-API form (`require("nvim-treesitter").install({...})` + a `FileType` autocmd calling `vim.treesitter.start(args.buf)` + `vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"`). Steps are documented in `AGENTS.md` §3.5; the current master form is recoverable from git (commit `2f57aac`) if the switch needs reverting.
 - Many `neovim` functionalities and features require `npm`, install it right after the `neovim` installation.
 ```
         sudo apt update
@@ -63,6 +67,48 @@ Consequences:
 - Undo globally: `git config --global --unset status.showUntrackedFiles`.
 
 For personal scratch files (notes, throwaway scripts) that should never show up at all, use the repo-local, never-committed ignore file `.git/info/exclude`.
+
+### Diff viewer: git-delta
+
+[git-delta](https://github.com/dandavison/delta) is the pager for `git diff`/`show`/`log -p` — syntax-highlighted, line-numbered hunks with file/hunk headers, plus optional side-by-side. Like lazygit, it's a standalone binary managed by neither Lazy nor Mason.
+
+`~/.gitconfig` (global — outside this repo, not tracked) enables it:
+
+```gitconfig
+[core]
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true              # n / N jump between hunks
+    line-numbers = true
+    side-by-side = false         # toggle at runtime with `
+    syntax-theme = Monokai Extended
+    dark = true
+[merge]
+    conflictstyle = zdiff3       # delta-recommended
+[diff]
+    colorMoved = default         # delta-recommended
+```
+
+In-view keys (from delta, not vim): `` ` `` toggles side-by-side, `?` shows the full keybind help, `q` quits. `side-by-side = false` is the upstream default so it renders cleanly in any terminal width; flip to `true` if you mainly work wide.
+
+> Note: this config is **not** part of the nvim config repo. To set it up on a new machine, install delta (e.g. `brew install git-delta`, the `.deb` from the releases page, or `cargo install git-delta`) and copy the `[core]`/`[interactive]`/`[delta]`/`[merge]`/`[diff]` blocks above into `~/.gitconfig`.
+
+#### Delta inside lazygit
+
+lazygit renders its own diff pane and does **not** honor git's `core.pager`, so the `~/.gitconfig` block above alone leaves lazygit's diffs unstyled. lazygit needs its own pager setting in `~/.config/lazygit/config.yml`:
+
+```yaml
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never
+```
+
+`--paging=never` is required — lazygit scrolls the pane itself, so delta must not try to paginate (it would freeze the view). Other delta options (theme, line numbers, etc.) are inherited from the `[delta]` block in `~/.gitconfig`.
+
+The truecolor fix in `lua/configs/toggleterm.lua` (`env = { COLORTERM = "truecolor" }`) covers the lazygit float, so delta's 24-bit colors render correctly inside it.
 
 ## Project management
 
