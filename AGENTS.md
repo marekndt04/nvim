@@ -83,7 +83,7 @@ Only when the plugin literally needs no setup, inline `opts = {}` is acceptable:
 - `event = "VeryLazy"` — mason-* bridges, auxiliary tools
 - `ft = "python"` / `ft = "rust"` — language-specific tools
 - `cmd = "SomeCmd"` — command-triggered plugins
-- `lazy = false` — only when strictly required (e.g. `rustaceanvim`, `markview.nvim`)
+- `lazy = false` — only when strictly required (e.g. `rustaceanvim`)
 
 ### 2.4 Dependencies
 
@@ -184,7 +184,7 @@ This config uses the **three Mason bridges**:
 ## 5. Keymaps
 
 - **Global keymaps that always apply** → `lua/mappings.lua` (after `require "nvchad.mappings"`).
-- **Plugin-specific keymaps** → inside that plugin’s file in `lua/configs/`. Example: DAP keymaps live in `configs/dap.lua`, nvim-tree toggle in `configs/nvim-tree.lua`, markview toggles in `autocmds.lua`.
+- **Plugin-specific keymaps** → inside that plugin’s file in `lua/configs/`. Example: DAP keymaps live in `configs/dap.lua`, nvim-tree toggle in `configs/nvim-tree.lua`, markview toggle in `autocmds.lua`.
 - Always use `local map = vim.keymap.set` and supply a `desc` field.
 
 ```lua

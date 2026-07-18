@@ -96,3 +96,9 @@ nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd`,
 
 `lua/options.lua` sets `title` + `titlestring` (`nvim — <cwd basename>`), so the iTerm title bar shows the active project name and updates on project switch. If the title bar shows the launch command instead, set the iTerm profile's Title to "Session Name" (Settings → Profiles → General).
 
+## Markdown rendering
+
+In-buffer markdown rendering is handled by [markview.nvim](https://github.com/OXY2DEV/markview.nvim) (spec in `lua/plugins/init.lua`, `priority = 49`, `lazy = false`).
+
+- `<leader>mm` toggles rendering (keymap in `lua/autocmds.lua`).
+

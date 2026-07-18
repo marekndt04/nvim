@@ -110,7 +110,6 @@ return {
         config = function()
             require("configs.mason-dap")
         end,
-        -- For `plugins/markview.lua` users.
     },
 
     {
