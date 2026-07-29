@@ -1,5 +1,10 @@
 local lint = require("lint")
 
+-- mason.nvim (which prepends its bin to PATH) loads at VeryLazy — after
+-- neovim-project restores sessions at startup. Prepend it here so linters
+-- resolve when BufEnter fires during session restore.
+vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
+
 lint.linters_by_ft = {
     lua = { "luacheck" },
     python = { "mypy", "ruff" },

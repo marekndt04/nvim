@@ -5,10 +5,6 @@ require("nvim-tree").setup({
     -- follow cwd changes (project switching via neovim-project)
     sync_root_with_cwd = true,
     respect_buf_cwd = true,
-    update_focused_file = {
-        enable = true,
-        update_root = true,
-    },
 })
 
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -16,6 +12,16 @@ vim.api.nvim_create_autocmd("VimEnter", {
         if vim.fn.argc() == 0 then
             require("nvim-tree.api").tree.open()
         end
+    end,
+})
+
+-- sessions never contain the tree (NvimTree is in autosave_ignore_filetypes),
+-- so reopen it after neovim-project restores a session
+vim.api.nvim_create_autocmd("User", {
+    pattern = "SessionLoadPost",
+    callback = function()
+        require("nvim-tree.api").tree.open()
+        vim.cmd("wincmd p")
     end,
 })
 

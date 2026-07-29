@@ -16,6 +16,9 @@ vim.opt.spelllang = { "en_gb" }
 o.title = true
 o.titlestring = "nvim — %{fnamemodify(getcwd(), ':t')}"
 
+-- delay before CursorHold fires (LSP reference highlighting); default 4000
+o.updatetime = 400
+
 -- Diagnostics UI: inline messages + underlines
 vim.diagnostic.config({
     underline = true,

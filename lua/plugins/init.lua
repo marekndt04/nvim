@@ -122,6 +122,8 @@ return {
 
     {
         "nvim-tree/nvim-tree.lua",
+        lazy = false, -- must load at startup: registers the VimEnter/SessionLoadPost
+        -- auto-open autocmds and the <leader>e keymap (defaults.lazy is true)
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("configs.nvim-tree")
@@ -133,6 +135,15 @@ return {
         event = "VeryLazy",
         config = function()
             require("configs.toggleterm")
+        end,
+    },
+
+    {
+        "hat0uma/csvview.nvim",
+        ft = { "csv", "tsv" },
+        cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle", "CsvViewInfo" },
+        config = function()
+            require("configs.csvview")
         end,
     },
 

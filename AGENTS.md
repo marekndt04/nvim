@@ -115,18 +115,30 @@ Pattern:
 
 Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not touch that file.
 
+The bottom of the file holds an `LspAttach` autocmd that highlights every reference of the
+symbol under the cursor (`textDocument/documentHighlight` on `CursorHold`/`CursorHoldI`,
+cleared on `CursorMoved`/`CursorMovedI`, per-buffer augroup). Its delay is `updatetime`,
+set in `options.lua` — the two are coupled, change them together. Keep new server
+registrations above this block.
+
 ### 3.2 Linting (`configs/lint.lua`)
 
 - Configure `lint.linters_by_ft = { <ft> = { "linter1", "linter2" } }`.
 - Tweak existing linters via `lint.linters.<name>.args` if needed.
 - The autocmd that triggers `lint.try_lint()` is already wired — do not duplicate it.
 - `configs/mason-lint.lua` auto-installs everything in `linters_by_ft`. Do not edit it when adding linters.
+- The `vim.env.PATH` prepend at the top of the file is **required** — `mason.nvim` only adds its
+  `bin` directory at `VeryLazy`, which is after neovim-project restores a session, so linters
+  would not resolve for the `BufEnter` that fires during restore. Do not remove it.
 
 ### 3.3 Formatting (`configs/conform.lua`)
 
 - Add formatters under `options.formatters_by_ft`.
 - Per-formatter overrides go in the (currently commented) `options.formatters` table — prefer `pyproject.toml`/project-level config when possible (comment in file makes this explicit).
-- `format_on_save` is enabled with `timeout_ms = 500`, `lsp_fallback = true`.
+- `format_on_save` is a **function**, not a table: it returns `{ timeout_ms = 500, lsp_fallback = true }`,
+  or `nil` (no formatting) when `vim.fs.root(bufnr, ".noautoformat")` finds that marker file in the
+  buffer's project root. Keep the function form when changing format options — collapsing it back to a
+  table drops the per-project opt-out.
 - `configs/mason-conform.lua` auto-installs formatters — leave it alone.
 
 ### 3.4 DAP
@@ -145,8 +157,17 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 
 - Call `require("nvim-tree").setup({ ... })`.
 - Includes a `VimEnter` autocmd that auto-opens the tree when nvim starts with no args.
+- Includes a `User`/`SessionLoadPost` autocmd that reopens the tree after neovim-project restores a
+  session — sessions never carry it (`NvimTree` is in `autosave_ignore_filetypes`, §3.7). It calls
+  `wincmd p` afterwards so focus returns to the file window.
 - Includes the `<leader>e` toggle keymap.
-- `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` are **required** — they make the tree follow cwd changes when neovim-project switches projects. Do not remove them.
+- The spec in `plugins/init.lua` must keep `lazy = false` — `defaults.lazy` is true, and both autocmds
+  plus the keymap have to be registered before `VimEnter`/session restore fire.
+- `sync_root_with_cwd` and `respect_buf_cwd` are **required** — they make the tree follow cwd changes
+  when neovim-project switches projects. Do not remove them.
+- `update_focused_file.update_root` was deliberately **removed**: it re-rooted the tree on every buffer
+  switch, so jumping into a venv library with `gd` left the tree showing a partial package directory.
+  Do not re-add it — on-demand re-rooting is the intended replacement.
 
 ### 3.7 neovim-project (`configs/neovim-project.lua`)
 
@@ -156,7 +177,14 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 - `session_manager_opts.autosave_ignore_filetypes` **replaces** the plugin defaults — when adding a filetype, keep the existing list (includes `toggleterm` and `NvimTree` to avoid broken session layouts).
 - Keymaps `<leader>fp` (picker) and `<leader>fP` (previous session) live here.
 
-### 3.8 Language-specific “mega” plugins
+### 3.8 csvview (`configs/csvview.lua`)
+
+- Tabular virtual-text view for csv/tsv (`hat0uma/csvview.nvim`), loaded via `ft = { "csv", "tsv" }` + its commands.
+- Plugin keymaps (field/row navigation, `if`/`af` text objects) go in the `keymaps` table of `setup()`, not `mappings.lua` — they must stay buffer-local to enabled buffers.
+- The `FileType` autocmd auto-enables the view; the loop over `nvim_list_bufs()` after it covers the buffer whose `FileType` event lazy-loaded the plugin. Keep both.
+- `<leader>cv` (toggle) and `<leader>ci` (info) live here.
+
+### 3.9 Language-specific “mega” plugins
 
 Some plugins (e.g. `rustaceanvim` for Rust) bypass `nvim-lspconfig` and `nvim-dap` setups. If one is added, configure it in its own file in `lua/configs/` using its native API.
 
@@ -200,8 +228,9 @@ map("n", "<leader>xx", "<cmd>SomeCmd<CR>", { desc = "Short description" })
 - `lua/options.lua` — first line must be `require("nvchad.options")`. Append `vim.o` / `vim.opt` settings below.
 - `lua/autocmds.lua` — first line must be `require("nvchad.autocmds")`. Add autocmds and a few global keymaps (buffer navigation, markview toggle) here.
 - `options.lua` sets `title` + `titlestring` (terminal title = `nvim — <cwd basename>`) so the iTerm title bar follows neovim-project switches — keep it.
+- `options.lua` sets `updatetime = 400` (default 4000) to drive the LSP reference highlighting in `configs/lspconfig.lua` (§3.1) — that is the delay before the highlight appears.
 
-Do not move plugin-related autocmds (lint trigger, nvim-tree auto-open) out of their respective `configs/` files.
+Do not move plugin-related autocmds (lint trigger, nvim-tree auto-open, tree reopen on session load) out of their respective `configs/` files.
 
 ---
 

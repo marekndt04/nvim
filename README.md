@@ -63,6 +63,36 @@ Consequences:
 
 For personal scratch files (notes, throwaway scripts) that should never show up at all, use the repo-local, never-committed ignore file `.git/info/exclude`.
 
+## CSV / TSV files
+
+[csvview.nvim](https://github.com/hat0uma/csvview.nvim) renders csv/tsv buffers as an aligned table using virtual text (the file on disk is untouched). Spec in `lua/plugins/init.lua`, config in `lua/configs/csvview.lua`.
+
+Opening a `csv` or `tsv` file enables the view automatically (`FileType` autocmd in the config file). Display mode is `border` (`│` between columns), header line is auto-detected and kept sticky at the top of the window.
+
+Keymaps (toggle, info, field/row navigation, `if`/`af` text objects) are defined in the `keymaps` table of `lua/configs/csvview.lua` so they stay buffer-local to enabled buffers. The `<S-Tab>` / `<S-Enter>` bindings need CSI-u mode in the terminal; in iTerm2 that's Settings → Profiles → Keys → "Report modifiers using CSI u".
+
+Commands accept per-invocation overrides, e.g. `:CsvViewToggle delimiter=; display_mode=highlight header_lnum=1`.
+
+## Formatting
+
+[conform.nvim](https://github.com/stevearc/conform.nvim) formats on save (`lua/configs/conform.lua`), with a 500 ms timeout and LSP fallback when no formatter is configured for the filetype.
+
+### Opting a project out
+
+Format-on-save is skipped for any buffer whose project root contains a `.noautoformat` file — useful for repos with a house style you don't want rewritten on every save:
+
+```
+touch /path/to/project/.noautoformat
+```
+
+The lookup is `vim.fs.root(bufnr, ".noautoformat")`, so the marker applies to the whole project tree from that directory down. Manual `:ConformInfo` / explicit format calls still work. Add the marker to `.git/info/exclude` if it shouldn't be committed.
+
+## LSP reference highlighting
+
+Resting the cursor on a symbol highlights all of its references in the buffer (`LspAttach` autocmd in `lua/configs/lspconfig.lua`), for any server supporting `textDocument/documentHighlight`. The highlight clears as soon as the cursor moves.
+
+The delay is `updatetime` in `lua/options.lua`, set to 400 ms (Neovim's default of 4000 is too slow to feel responsive).
+
 ## Project management
 
 Projects are managed by [neovim-project](https://github.com/coffebar/neovim-project) (spec in `lua/plugins/init.lua`, config in `lua/configs/neovim-project.lua`), backed by [neovim-session-manager](https://github.com/Shatur/neovim-session-manager) for per-project sessions (open tabs/buffers restored on return — PyCharm-style "reopen where I left off").
@@ -89,7 +119,11 @@ Project discovery patterns: `~/workspace/*` plus `~/.config/nvim`.
 
 ### File explorer follows project switches
 
-nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
+nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd` and `respect_buf_cwd` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
+
+Because `NvimTree` buffers are excluded from session saves (see above), a restored session comes back without the tree. A `SessionLoadPost` autocmd reopens it and hands focus back to the file window, so the layout looks the same as when you left.
+
+The tree root does *not* follow the focused buffer: jumping into a venv library with `gd` leaves the tree at the project root rather than re-rooting at a partial package directory.
 
 ### Terminal title follows the project
 
