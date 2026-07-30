@@ -75,7 +75,32 @@ Only when the plugin literally needs no setup, inline `opts = {}` is acceptable:
 },
 ```
 
-### 2.3 Lazy-loading triggers (pick the lightest one that works)
+### 2.3 Extending an NvChad-provided plugin
+
+`init.lua` imports `nvchad.plugins` *before* `plugins`, so a second spec for a plugin NvChad already ships composes with NvChad's instead of replacing it. Extend its options with an `opts` **function** — lazy calls it with NvChad's merged opts as the second argument:
+
+```lua
+{
+    "nvim-telescope/telescope.nvim",
+    opts = function(_, opts)
+        opts.defaults = opts.defaults or {}
+        opts.defaults.some_option = value
+        opts.pickers = vim.tbl_deep_extend("force", opts.pickers or {}, { ... })
+        return opts
+    end,
+},
+```
+
+- This is the exception to §2.1. Do **not** write `config = function() require("configs.telescope") end` for these — a `config` function replaces NvChad's wholesale, so its prompt icons, layout, and `extensions_list` would have to be restated by hand. §2.1 governs plugins this config owns outright.
+- A plain `opts = { ... }` table is fine for adding independent keys (lazy deep-merges it), but list-like values such as `vimgrep_arguments` are replaced as a unit — use the function form whenever the new value has to be derived from, or merged into, what NvChad set.
+- Verify a merge did what you expect without launching the UI:
+
+```
+nvim --headless -c "lua local p = require('lazy.core.config').plugins['telescope.nvim']
+  vim.print(require('lazy.core.plugin').values(p, 'opts'))" -c 'qa!'
+```
+
+### 2.4 Lazy-loading triggers (pick the lightest one that works)
 
 - `event = { "BufReadPre", "BufNewFile" }` — LSP, linters, treesitter
 - `event = "BufWritePre"` — formatters (conform)
@@ -84,7 +109,7 @@ Only when the plugin literally needs no setup, inline `opts = {}` is acceptable:
 - `cmd = "SomeCmd"` — command-triggered plugins
 - `lazy = false` — only when strictly required (e.g. `markview.nvim`)
 
-### 2.4 Dependencies
+### 2.5 Dependencies
 
 Use `dependencies = { ... }` for hard requirements. Mason bridge plugins always depend on their underlying plugin:
 

@@ -131,6 +131,36 @@ return {
     },
 
     {
+        "nvim-telescope/telescope.nvim",
+        opts = function(_, opts)
+            opts.defaults = opts.defaults or {}
+            -- telescope's default rg args omit --hidden, so live_grep/grep_string
+            -- never searched inside .gitlab-ci.yml, .flake8, .pre-commit-config.yaml
+            opts.defaults.vimgrep_arguments = {
+                "rg",
+                "--color=never",
+                "--no-heading",
+                "--with-filename",
+                "--line-number",
+                "--column",
+                "--smart-case",
+                "--hidden",
+                "--glob=!**/.git/*", -- .git is hidden but not gitignored, exclude it explicitly
+            }
+            opts.pickers = vim.tbl_deep_extend("force", opts.pickers or {}, {
+                find_files = {
+                    -- rg/fd skip dot-prefixed paths by default, hiding .gitlab-ci.yml & co.
+                    hidden = true,
+                    -- .git is hidden but not gitignored, so --hidden pulls in its
+                    -- ~6000 internal files; keep them out of the picker
+                    file_ignore_patterns = { "^%.git/" },
+                },
+            })
+            return opts
+        end,
+    },
+
+    {
         "akinsho/toggleterm.nvim",
         event = "VeryLazy",
         config = function()

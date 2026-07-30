@@ -93,6 +93,21 @@ Resting the cursor on a symbol highlights all of its references in the buffer (`
 
 The delay is `updatetime` in `lua/options.lua`, set to 400 ms (Neovim's default of 4000 is too slow to feel responsive).
 
+## Fuzzy finding and grep
+
+Telescope comes from NvChad; `lua/plugins/init.lua` overrides only the search defaults that hide dotfiles, via an `opts` function so NvChad's prompt icons and layout survive.
+
+Both `rg` and `fd` skip dot-prefixed paths unless told otherwise, so out of the box `.gitlab-ci.yml`, `.flake8`, `.dockerignore` and friends were missing from `<leader>ff` and unsearchable with `<leader>fw`:
+
+- `pickers.find_files.hidden = true` — dotfiles now listed by `<leader>ff`.
+- `defaults.vimgrep_arguments` — telescope's default rg arguments plus `--hidden`, so `live_grep` / `grep_string` read inside them.
+
+`.git/` has to be excluded separately, because it is hidden but *not* gitignored — with `--hidden` alone it contributes several thousand internal files. That takes two mechanisms, one per picker type: `file_ignore_patterns = { "^%.git/" }` for `find_files` (matched against the relative path `rg --files` emits) and `--glob=!**/.git/*` for grep.
+
+`.gitignore` is still respected — no `--no-ignore` anywhere — so `.venv`, `.mypy_cache` and large local dumps stay out of results. `<leader>fa` remains the escape hatch: NvChad maps it to `find_files follow=true no_ignore=true hidden=true`, which shows everything.
+
+`fd` is not installed here, so `find_files` falls back to `rg --files`. Installing it (`brew install fd`) only makes the picker faster — it needs the same `--hidden` treatment either way.
+
 ## Project management
 
 Projects are managed by [neovim-project](https://github.com/coffebar/neovim-project) (spec in `lua/plugins/init.lua`, config in `lua/configs/neovim-project.lua`), backed by [neovim-session-manager](https://github.com/Shatur/neovim-session-manager) for per-project sessions (open tabs/buffers restored on return — PyCharm-style "reopen where I left off").
