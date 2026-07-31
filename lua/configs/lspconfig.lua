@@ -23,6 +23,30 @@ vim.lsp.config("pyright", {
     on_attach = on_attach,
     on_init = on_init,
     capabilities = capabilities,
+    root_dir = function(bufnr, on_dir)
+        local root = vim.fs.root(bufnr, {
+            "pyrightconfig.json",
+            "pyproject.toml",
+            "setup.py",
+            "setup.cfg",
+            "requirements.txt",
+            "Pipfile",
+            ".git",
+        })
+        if root then
+            on_dir(root)
+            return
+        end
+        -- No project markers: this is a library/stdlib file opened via
+        -- go-to-definition. Attach it to an already-running pyright
+        -- workspace so navigation keeps working inside dependencies.
+        local existing_client = vim.lsp.get_clients({ name = "pyright" })[1]
+        if existing_client and existing_client.config.root_dir then
+            on_dir(existing_client.config.root_dir)
+            return
+        end
+        on_dir(vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr)))
+    end,
     settings = {
         python = {
             analysis = {

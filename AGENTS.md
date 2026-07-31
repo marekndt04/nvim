@@ -140,6 +140,14 @@ Pattern:
 
 Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not touch that file.
 
+The pyright block has a custom `root_dir` function — **keep it when editing that block**. It has
+three branches: (1) marker walk via `vim.fs.root` (normal project files); (2) no markers found →
+reuse the root of the already-running pyright client, so library/stdlib buffers opened via
+go-to-definition join the project workspace and `gd` keeps working inside site-packages
+(poetry venvs live outside the project tree, so those files never have markers); (3) fallback to
+the file's own directory. Removing the function or replacing it with plain `root_markers`
+reintroduces the bug where navigation dies one level deep into dependencies.
+
 The bottom of the file holds an `LspAttach` autocmd that highlights every reference of the
 symbol under the cursor (`textDocument/documentHighlight` on `CursorHold`/`CursorHoldI`,
 cleared on `CursorMoved`/`CursorMovedI`, per-buffer augroup). Its delay is `updatetime`,

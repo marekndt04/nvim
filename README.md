@@ -87,6 +87,14 @@ touch /path/to/project/.noautoformat
 
 The lookup is `vim.fs.root(bufnr, ".noautoformat")`, so the marker applies to the whole project tree from that directory down. Manual `:ConformInfo` / explicit format calls still work. Add the marker to `.git/info/exclude` if it shouldn't be committed.
 
+## Go-to-definition inside dependencies
+
+pyright's workspace root is found by walking up from the current file for project markers (`pyproject.toml`, `.git`, …). Files opened via `gd` from a poetry venv live outside any project (`~/Library/Caches/pypoetry/virtualenvs/...`), so they have no markers — by default they got a rootless pyright instance that didn't know the venv, and navigation died one level deep into site-packages.
+
+The custom `root_dir` function in `lua/configs/lspconfig.lua` fixes this: buffers without project markers attach to the already-running pyright workspace, which knows the venv (via the project's `pyrightconfig.json`), so `gd` keeps working at any depth inside dependencies. No hardcoded paths — it works for any project.
+
+Caveat: with two Python projects open in one nvim instance, a library buffer attaches to whichever pyright client started first.
+
 ## LSP reference highlighting
 
 Resting the cursor on a symbol highlights all of its references in the buffer (`LspAttach` autocmd in `lua/configs/lspconfig.lua`), for any server supporting `textDocument/documentHighlight`. The highlight clears as soon as the cursor moves.
