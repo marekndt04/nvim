@@ -2,6 +2,7 @@ require("nvim-tree").setup({
     filters = {
         dotfiles = true,
     },
+    -- follow cwd changes (project switching via neovim-project)
     sync_root_with_cwd = true,
     respect_buf_cwd = true,
     update_focused_file = {

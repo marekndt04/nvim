@@ -8,6 +8,7 @@ require("neovim-project").setup({
     },
     session_manager_opts = {
         autosave_ignore_filetypes = {
+            -- plugin defaults, plus NvimTree so tree windows aren't saved into sessions
             "ccc-ui",
             "dap-repl",
             "dap-view",

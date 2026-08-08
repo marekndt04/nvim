@@ -2,6 +2,9 @@ require("toggleterm").setup({})
 
 local Terminal = require("toggleterm.terminal").Terminal
 
+-- lazygit terminal is created per project root: after a cwd change
+-- (neovim-project switch) the old instance is discarded, otherwise
+-- lazygit keeps tracking the previous project's repo
 local lazygit = nil
 local lazygit_dir = nil
 
@@ -17,6 +20,8 @@ local function toggle_lazygit()
             dir = cwd,
             direction = "float",
             hidden = true,
+            -- nvim strips COLORTERM from embedded terminals, breaking lazygit's
+            -- truecolor detection (diff pane renders without red/green)
             env = { COLORTERM = "truecolor" },
             float_opts = {
                 border = "curved",
