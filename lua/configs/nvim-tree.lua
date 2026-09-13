@@ -7,10 +7,6 @@ require("nvim-tree").setup({
     -- follow cwd changes (project switching via neovim-project)
     sync_root_with_cwd = true,
     respect_buf_cwd = true,
-    update_focused_file = {
-        enable = true,
-        update_root = true,
-    },
 })
 
 local map = vim.keymap.set

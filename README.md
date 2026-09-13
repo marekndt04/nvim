@@ -136,7 +136,7 @@ Project discovery patterns: `~/workspace/*` plus `~/.config/nvim`.
 
 ### File explorer follows project switches
 
-nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
+nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd` and `respect_buf_cwd` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
 
 ### Terminal title follows the project
 

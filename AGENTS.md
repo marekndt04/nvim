@@ -151,7 +151,8 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 
 - Call `require("nvim-tree").setup({ ... })`.
 - The tree **never opens by itself** — the auto-open autocmds (`VimEnter`, `SessionLoadPost`) were removed deliberately, do not re-add them. The only entry point is the `<leader>e` toggle keymap.
-- `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` are **required** — they make the tree follow cwd changes when neovim-project switches projects. Do not remove them.
+- `sync_root_with_cwd` and `respect_buf_cwd` are **required** — they make the tree follow cwd changes when neovim-project switches projects. Do not remove them.
+- `update_focused_file` is deliberately disabled — auto-revealing the current buffer's file breaks the general flow. The tree still follows project switches via the two options above; do not re-enable it.
 - `filters.exclude` entries are **Lua patterns, not globs**, matched (unanchored) against the full path — dots must be escaped (`mypy%.ini`). They override every filter, including `dotfiles` and gitignore.
 
 ### 3.7 Language-specific “mega” plugins (e.g. `rustaceanvim`)
