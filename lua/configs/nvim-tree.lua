@@ -1,6 +1,8 @@
 require("nvim-tree").setup({
     filters = {
         dotfiles = true,
+        -- shown despite being gitignored; Lua patterns matched against the full path
+        exclude = { "general%-prompt%.txt", "mypy%.ini", "pyrightconfig%.json", "local%.py" },
     },
     -- follow cwd changes (project switching via neovim-project)
     sync_root_with_cwd = true,
@@ -9,14 +11,6 @@ require("nvim-tree").setup({
         enable = true,
         update_root = true,
     },
-})
-
-vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        if vim.fn.argc() == 0 then
-            require("nvim-tree.api").tree.open()
-        end
-    end,
 })
 
 local map = vim.keymap.set

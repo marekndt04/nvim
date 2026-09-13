@@ -5,11 +5,10 @@ local opts = { noremap = true, silent = true }
 -- Insert mode escape shortcut
 -- map("i", "jk", "<ESC>", opts)
 
--- Alt+j → Next buffer
-map("n", "<A-k>", ":bnext<CR>", opts)
-
--- Alt+k → Previous buffer
-map("n", "<A-j>", ":bprevious<CR>", opts)
+-- :bnext/:bprevious walk buffer numbers, which diverge from the visible tab order
+local tabufline = require("nvchad.tabufline")
+map("n", "<A-k>", tabufline.next, { desc = "Buffer goto next" })
+map("n", "<A-j>", tabufline.prev, { desc = "Buffer goto prev" })
 
 -- toggle preview
 map("n", "<leader>mt", ":Markview splitOpen<CR>", opts)

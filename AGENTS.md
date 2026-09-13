@@ -31,9 +31,10 @@ lua/
     ├── dap-python.lua
     ├── mason-dap.lua
     ├── treesitter.lua
-    ├── nvim-tree.lua
+    ├── nvim-tree.lua      # file explorer (on-demand only, opens via <leader>e)
     ├── rustacean.lua      # rustaceanvim mega-plugin (Rust LSP + DAP)
     ├── toggleterm.lua     # floating terminal + lazygit integration
+    ├── csvview.lua        # csv/tsv tabular view (auto-enabled on FileType)
     └── neovim-project.lua # project/session manager (projects under ~/workspace)
 ```
 
@@ -105,9 +106,10 @@ Each file is self-contained and **does its own `require("plugin").setup(...)`**.
 
 Pattern:
 1. Pull NvChad defaults (`on_attach`, `on_init`, `capabilities`).
-2. Append server names to `lspconfig.servers` (this list drives `mason-lspconfig` install).
-3. For servers using only defaults, iterate `default_servers` and call `vim.lsp.config(name, { on_attach, on_init, capabilities })`.
-4. For servers needing custom settings, call `vim.lsp.config(name, { on_attach, on_init, capabilities, settings = { ... } })` explicitly.
+2. `vim.diagnostic.config` lives here, above the `lspconfig.servers` table — not in `options.lua`. The nvim-lspconfig spec runs `nvchad.configs.lspconfig.defaults()` (which itself calls `vim.diagnostic.config`) immediately before `require("configs.lspconfig")`, so this file gets the last word; anything set in `options.lua` is overwritten.
+3. Append server names to `lspconfig.servers` (this list drives `mason-lspconfig` install).
+4. For servers using only defaults, iterate `default_servers` and call `vim.lsp.config(name, { on_attach, on_init, capabilities })`.
+5. For servers needing custom settings, call `vim.lsp.config(name, { on_attach, on_init, capabilities, settings = { ... } })` explicitly.
 
 **Adding a new LSP server:**
 - Add its name to the `lspconfig.servers` table.
@@ -122,12 +124,13 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 - Tweak existing linters via `lint.linters.<name>.args` if needed.
 - The autocmd that triggers `lint.try_lint()` is already wired — do not duplicate it.
 - `configs/mason-lint.lua` auto-installs everything in `linters_by_ft`. Do not edit it when adding linters.
+- **No mypy, deliberately — do not re-add it globally.** Pyright already type-checks, and Mason's mypy runs in its own venv so it flags every third-party import as missing.
 
 ### 3.3 Formatting (`configs/conform.lua`)
 
 - Add formatters under `options.formatters_by_ft`.
 - Per-formatter overrides go in the (currently commented) `options.formatters` table — prefer `pyproject.toml`/project-level config when possible (comment in file makes this explicit).
-- `format_on_save` is enabled with `timeout_ms = 500`, `lsp_fallback = true`.
+- **Format-on-save is deliberately disabled** — per-project pre-commit hooks and make targets own formatting, and black/isort defaults would rewrap ruff projects. Formatting runs on demand via `<leader>fm` (NvChad mapping, `lsp_fallback = true`). A `.noautoformat` marker does nothing here. To re-enable, restore the `format_on_save` block from git history and make `formatters_by_ft.python` choose ruff vs black per project — there is no commented restore block in the file.
 - `configs/mason-conform.lua` auto-installs formatters — leave it alone.
 
 ### 3.4 DAP
@@ -147,9 +150,9 @@ Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not
 ### 3.6 nvim-tree (`configs/nvim-tree.lua`)
 
 - Call `require("nvim-tree").setup({ ... })`.
-- Includes a `VimEnter` autocmd that auto-opens the tree when nvim starts with no args.
-- Includes the `<leader>e` toggle keymap.
+- The tree **never opens by itself** — the auto-open autocmds (`VimEnter`, `SessionLoadPost`) were removed deliberately, do not re-add them. The only entry point is the `<leader>e` toggle keymap.
 - `sync_root_with_cwd`, `respect_buf_cwd`, and `update_focused_file.update_root` are **required** — they make the tree follow cwd changes when neovim-project switches projects. Do not remove them.
+- `filters.exclude` entries are **Lua patterns, not globs**, matched (unanchored) against the full path — dots must be escaped (`mypy%.ini`). They override every filter, including `dotfiles` and gitignore.
 
 ### 3.7 Language-specific “mega” plugins (e.g. `rustaceanvim`)
 
@@ -200,7 +203,7 @@ map("n", "<leader>xx", "<cmd>SomeCmd<CR>", { desc = "Short description" })
 
 ## 6. Options and autocmds
 
-- `lua/options.lua` — first line must be `require("nvchad.options")`. Append `vim.o` / `vim.opt` settings below.
+- `lua/options.lua` — first line must be `require("nvchad.options")`. Append `vim.o` / `vim.opt` settings below. Do not configure diagnostics here — NvChad's `defaults()` overwrites them; `vim.diagnostic.config` lives in `configs/lspconfig.lua` (§3.1).
 - `lua/autocmds.lua` — first line must be `require("nvchad.autocmds")`. Add autocmds and a few global keymaps (buffer navigation, markview toggle) here.
 - `options.lua` sets `title` + `titlestring` (terminal title = `nvim — <cwd basename>`) so the iTerm title bar follows neovim-project switches — keep it.
 

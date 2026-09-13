@@ -148,3 +148,15 @@ In-buffer markdown rendering is handled by [markview.nvim](https://github.com/OX
 
 - `<leader>mm` toggles rendering (keymap in `lua/autocmds.lua`).
 
+## CSV viewing
+
+[csvview.nvim](https://github.com/hat0uma/csvview.nvim) renders csv/tsv buffers as a bordered table with a sticky header (spec in `lua/plugins/init.lua`, config in `lua/configs/csvview.lua`). It lazy-loads on csv/tsv filetypes and auto-enables the tabular view; `<Tab>`/`<S-Tab>` jump between fields, `<Enter>`/`<S-Enter>` between rows (only while csvview is active).
+
+| Key | Action |
+|---|---|
+| `<leader>cv` | Toggle tabular view |
+| `<leader>ci` | CSV buffer info |
+
+The `<S-Tab>` / `<S-Enter>` mappings need a terminal that speaks the kitty keyboard protocol. On this machine the terminal is **Ghostty**, which implements the protocol natively — Neovim auto-negotiates it at startup, so no extra terminal configuration is required (unlike iTerm2, which needs CSI-u mode enabled manually).
+
+

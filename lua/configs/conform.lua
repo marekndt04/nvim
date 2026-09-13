@@ -20,11 +20,8 @@ local options = {
     --         },
     --     },
     -- },
-    format_on_save = {
-        -- These options will be passed to conform.format()
-        timeout_ms = 500,
-        lsp_fallback = true,
-    },
+    -- No format_on_save: per-project pre-commit hooks and make targets own
+    -- formatting, and black/isort defaults would rewrap ruff projects.
 }
 
 require("conform").setup(options)

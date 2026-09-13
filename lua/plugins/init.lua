@@ -161,4 +161,13 @@ return {
             require("configs.neovim-project")
         end,
     },
+
+    {
+        "hat0uma/csvview.nvim",
+        ft = { "csv", "tsv" },
+        cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle", "CsvViewInfo" },
+        config = function()
+            require("configs.csvview")
+        end,
+    },
 }

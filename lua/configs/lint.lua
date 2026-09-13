@@ -1,8 +1,10 @@
 local lint = require("lint")
 
+-- No mypy: pyright already type-checks, and Mason's mypy runs in its own venv
+-- so it flags every third-party import as missing.
 lint.linters_by_ft = {
     lua = { "luacheck" },
-    python = { "mypy", "ruff" },
+    python = { "ruff" },
 }
 
 lint.linters.luacheck.args = {
