@@ -122,8 +122,8 @@ return {
 
     {
         "nvim-tree/nvim-tree.lua",
-        lazy = false, -- must load at startup: registers the VimEnter/SessionLoadPost
-        -- auto-open autocmds and the <leader>e keymap (defaults.lazy is true)
+        lazy = false, -- must load at startup: registers the <leader>e keymap
+        -- (defaults.lazy is true)
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("configs.nvim-tree")

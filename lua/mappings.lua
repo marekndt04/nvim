@@ -19,4 +19,9 @@ map("n", "<leader>cr", function()
     vim.notify("Copied: " .. path)
 end, { desc = "Copy relative file path" })
 
+-- <C-w>d is the built-in equivalent but scopes to the whole line
+map("n", "<leader>dd", function()
+    vim.diagnostic.open_float({ scope = "cursor" })
+end, { desc = "Diagnostic under cursor" })
+
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")

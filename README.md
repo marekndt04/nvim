@@ -75,17 +75,15 @@ Commands accept per-invocation overrides, e.g. `:CsvViewToggle delimiter=; displ
 
 ## Formatting
 
-[conform.nvim](https://github.com/stevearc/conform.nvim) formats on save (`lua/configs/conform.lua`), with a 500 ms timeout and LSP fallback when no formatter is configured for the filetype.
+[conform.nvim](https://github.com/stevearc/conform.nvim) is configured (`lua/configs/conform.lua`) with stylua for Lua and isort + black for Python, but **format-on-save is off**. Formatting is invoked manually with `<leader>fm` (NvChad's mapping, normal and visual mode) or `:ConformInfo` to inspect what would run.
 
-### Opting a project out
+### Why on-save is disabled
 
-Format-on-save is skipped for any buffer whose project root contains a `.noautoformat` file — useful for repos with a house style you don't want rewritten on every save:
+Formatting is owned per project by pre-commit hooks and `make reformat` / `make black` targets, which read that project's own config. A single global formatter cannot: black/isort defaults (88 columns, no first-party import map) silently rewrap projects configured for ruff at a different width.
 
-```
-touch /path/to/project/.noautoformat
-```
+The `.noautoformat` per-project opt-out marker that used to gate on-save formatting is gone with it — the marker file no longer does anything.
 
-The lookup is `vim.fs.root(bufnr, ".noautoformat")`, so the marker applies to the whole project tree from that directory down. Manual `:ConformInfo` / explicit format calls still work. Add the marker to `.git/info/exclude` if it shouldn't be committed.
+To re-enable on-save formatting, restore the `format_on_save` function in `lua/configs/conform.lua` (the previous version is in git history) and make `formatters_by_ft.python` pick ruff vs black from the project config.
 
 ## Go-to-definition inside dependencies
 
@@ -144,7 +142,7 @@ Project discovery patterns: `~/workspace/*` plus `~/.config/nvim`.
 
 nvim-tree is configured (`lua/configs/nvim-tree.lua`) with `sync_root_with_cwd` and `respect_buf_cwd` so its root re-anchors when neovim-project changes the cwd. Without these, the tree keeps showing the previous project after a switch.
 
-Because `NvimTree` buffers are excluded from session saves (see above), a restored session comes back without the tree. A `SessionLoadPost` autocmd reopens it and hands focus back to the file window, so the layout looks the same as when you left.
+The tree never opens on its own — not on startup, not on session restore (`NvimTree` buffers are excluded from session saves, see above). Open it with `<leader>e` when you want it.
 
 The tree root does *not* follow the focused buffer: jumping into a venv library with `gd` leaves the tree at the project root rather than re-rooting at a partial package directory.
 

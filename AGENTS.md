@@ -32,6 +32,7 @@ lua/
     ├── mason-dap.lua
     ├── treesitter.lua
     ├── nvim-tree.lua
+    ├── csvview.lua      # tabular virtual-text view for csv/tsv
     ├── toggleterm.lua   # floating terminal + lazygit integration
     └── neovim-project.lua # project/session manager (projects under ~/workspace)
 ```
@@ -140,6 +141,11 @@ Pattern:
 
 Mason will pick it up automatically via `configs/mason-lspconfig.lua` — do not touch that file.
 
+The `vim.diagnostic.config` block near the top belongs here, not in `options.lua`: NvChad's
+`nvchad.configs.lspconfig.defaults()` calls `vim.diagnostic.config` itself, and the spec in
+`plugins/init.lua` runs `defaults()` immediately before `require("configs.lspconfig")` — so this
+file is what gets the last word. Keys omitted from the block keep NvChad's values.
+
 The pyright block has a custom `root_dir` function — **keep it when editing that block**. It has
 three branches: (1) marker walk via `vim.fs.root` (normal project files); (2) no markers found →
 reuse the root of the already-running pyright client, so library/stdlib buffers opened via
@@ -163,15 +169,18 @@ registrations above this block.
 - The `vim.env.PATH` prepend at the top of the file is **required** — `mason.nvim` only adds its
   `bin` directory at `VeryLazy`, which is after neovim-project restores a session, so linters
   would not resolve for the `BufEnter` that fires during restore. Do not remove it.
+- mypy is deliberately **not** in `linters_by_ft` — pyright covers type checking, and Mason's mypy
+  runs in its own venv so it flags every third-party import as missing. Do not add it back globally.
 
 ### 3.3 Formatting (`configs/conform.lua`)
 
 - Add formatters under `options.formatters_by_ft`.
 - Per-formatter overrides go in the (currently commented) `options.formatters` table — prefer `pyproject.toml`/project-level config when possible (comment in file makes this explicit).
-- `format_on_save` is a **function**, not a table: it returns `{ timeout_ms = 500, lsp_fallback = true }`,
-  or `nil` (no formatting) when `vim.fs.root(bufnr, ".noautoformat")` finds that marker file in the
-  buffer's project root. Keep the function form when changing format options — collapsing it back to a
-  table drops the per-project opt-out.
+- `format_on_save` is deliberately **absent** — formatting runs only on demand (`<leader>fm`, NvChad's
+  mapping). Per-project pre-commit hooks and `make` targets own formatting; the global black/isort
+  defaults here would rewrap projects configured for ruff at another width. Re-enabling it means
+  restoring the function *and* making `formatters_by_ft.python` choose ruff vs black per project;
+  the previous version, including the `.noautoformat` opt-out it gated on, is in git history.
 - `configs/mason-conform.lua` auto-installs formatters — leave it alone.
 
 ### 3.4 DAP
@@ -189,15 +198,16 @@ registrations above this block.
 ### 3.6 nvim-tree (`configs/nvim-tree.lua`)
 
 - Call `require("nvim-tree").setup({ ... })`.
-- Includes a `VimEnter` autocmd that auto-opens the tree when nvim starts with no args.
-- Includes a `User`/`SessionLoadPost` autocmd that reopens the tree after neovim-project restores a
-  session — sessions never carry it (`NvimTree` is in `autosave_ignore_filetypes`, §3.7). It calls
-  `wincmd p` afterwards so focus returns to the file window.
-- Includes the `<leader>e` toggle keymap.
-- The spec in `plugins/init.lua` must keep `lazy = false` — `defaults.lazy` is true, and both autocmds
-  plus the keymap have to be registered before `VimEnter`/session restore fire.
+- Includes the `<leader>e` toggle keymap. The tree is **on demand only** — it never opens by itself.
+  Auto-open autocmds (`VimEnter` with no args, `SessionLoadPost` reopen) were deliberately removed:
+  they made the tree the startup window and got in the way of other window/session work. Do not
+  re-add them.
+- The spec in `plugins/init.lua` keeps `lazy = false` — `defaults.lazy` is true, so nothing would
+  register the keymap otherwise.
 - `sync_root_with_cwd` and `respect_buf_cwd` are **required** — they make the tree follow cwd changes
   when neovim-project switches projects. Do not remove them.
+- `filters.exclude` entries are **Lua patterns** matched against the full path (`path:match(entry)`),
+  not globs — escape dots (`mypy%.ini`). They override every filter, including `dotfiles`.
 - `update_focused_file.update_root` was deliberately **removed**: it re-rooted the tree on every buffer
   switch, so jumping into a venv library with `gd` left the tree showing a partial package directory.
   Do not re-add it — on-demand re-rooting is the intended replacement.
@@ -262,8 +272,10 @@ map("n", "<leader>xx", "<cmd>SomeCmd<CR>", { desc = "Short description" })
 - `lua/autocmds.lua` — first line must be `require("nvchad.autocmds")`. Add autocmds and a few global keymaps (buffer navigation, markview toggle) here.
 - `options.lua` sets `title` + `titlestring` (terminal title = `nvim — <cwd basename>`) so the iTerm title bar follows neovim-project switches — keep it.
 - `options.lua` sets `updatetime = 400` (default 4000) to drive the LSP reference highlighting in `configs/lspconfig.lua` (§3.1) — that is the delay before the highlight appears.
+- Diagnostics are **not** configured here. `vim.diagnostic.config` lives in `configs/lspconfig.lua`
+  (§3.1) because NvChad's `defaults()` calls it too — see that section for the ordering.
 
-Do not move plugin-related autocmds (lint trigger, nvim-tree auto-open, tree reopen on session load) out of their respective `configs/` files.
+Do not move plugin-related autocmds (lint trigger, csvview auto-enable) out of their respective `configs/` files.
 
 ---
 

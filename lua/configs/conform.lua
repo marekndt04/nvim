@@ -20,17 +20,8 @@ local options = {
     --         },
     --     },
     -- },
-    -- Opt a project out of format-on-save with a `.noautoformat` file in its root.
-    format_on_save = function(bufnr)
-        if vim.fs.root(bufnr, ".noautoformat") then
-            return
-        end
-        -- These options will be passed to conform.format()
-        return {
-            timeout_ms = 500,
-            lsp_fallback = true,
-        }
-    end,
+    -- No format_on_save: per-project pre-commit hooks and make targets own
+    -- formatting, and black/isort defaults would rewrap ruff projects.
 }
 
 require("conform").setup(options)
