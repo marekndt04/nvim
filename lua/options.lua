@@ -35,3 +35,5 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 vim.schedule(function()
     vim.cmd("doautocmd ColorScheme")
 end)
+
+o.winbar = "%=%m %f"
