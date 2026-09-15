@@ -114,6 +114,19 @@ Both `rg` and `fd` skip dot-prefixed paths unless told otherwise, so out of the 
 
 `fd` is not installed here, so `find_files` falls back to `rg --files`. Installing it (`brew install fd`) only makes the picker faster — it needs the same `--hidden` treatment either way.
 
+### Scratch directories (`<leader>fn` / `<leader>fN`)
+
+`~/.config/git/ignore` hides `workbench/` and `code_reviews/` in every repo, so they stay out of the everyday pickers — that is the point of ignoring them. The two mappings in `lua/mappings.lua` search them on demand and nothing else:
+
+| Key | Action |
+|---|---|
+| `<leader>fn` | Find files in `workbench/` + `code_reviews/` |
+| `<leader>fN` | Live grep in `workbench/` + `code_reviews/` |
+
+Both are plain `:Telescope` commands — `search_dirs` is one of telescope's `split_keywords` (`lua/telescope/command.lua`), so a comma list parses into a table without any Lua wrapper. No ignore-disabling flags are involved either: ripgrep searches a directory named explicitly on the command line even when an ignore file excludes it.
+
+In a project that has neither directory the picker errors (rg on a missing path) instead of opening empty — the trade for keeping the mapping a one-liner.
+
 ## Project management
 
 Projects are managed by [neovim-project](https://github.com/coffebar/neovim-project) (spec in `lua/plugins/init.lua`, config in `lua/configs/neovim-project.lua`), backed by [neovim-session-manager](https://github.com/Shatur/neovim-session-manager) for per-project sessions (open tabs/buffers restored on return — PyCharm-style "reopen where I left off").

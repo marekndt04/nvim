@@ -25,3 +25,18 @@ map("n", "<leader>dd", function()
 end, { desc = "Diagnostic under cursor" })
 
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
+
+-- workbench/ and code_reviews/ are in ~/.config/git/ignore, so the everyday pickers
+-- skip them; rg searches a directory named explicitly even when an ignore excludes it
+map(
+    "n",
+    "<leader>fn",
+    "<cmd>Telescope find_files search_dirs=workbench,code_reviews<CR>",
+    { desc = "Find files in workbench/code_reviews" }
+)
+map(
+    "n",
+    "<leader>fN",
+    "<cmd>Telescope live_grep search_dirs=workbench,code_reviews<CR>",
+    { desc = "Live grep in workbench/code_reviews" }
+)
